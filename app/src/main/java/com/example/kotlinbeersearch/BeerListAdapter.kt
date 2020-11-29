@@ -5,8 +5,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class BeerListAdapter(private val myDataset: List<Beer>):
+class BeerListAdapter(private val myDataset: List<Beer>, val pageSize: Int):
     RecyclerView.Adapter<BeerListAdapter.BeerViewHolder>() {
+
+    var page = 0
 
     class BeerViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 
@@ -23,9 +25,13 @@ class BeerListAdapter(private val myDataset: List<Beer>):
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        val currentBeer = myDataset[position]
+        val currentBeer = myDataset[position + page*pageSize]
         holder.textView.text = """Name: ${currentBeer.name} Tagline: ${currentBeer.tagline} Description: ${currentBeer.description}"""
     }
 
     override fun getItemCount() = myDataset.size
+
+    fun nextPage(){
+        page++
+    }
 }

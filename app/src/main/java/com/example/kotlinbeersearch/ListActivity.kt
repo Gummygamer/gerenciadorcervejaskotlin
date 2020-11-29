@@ -17,6 +17,8 @@ class ListActivity : AppCompatActivity() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
+    var isLoading = false
+    var pageSize = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,34 @@ class ListActivity : AppCompatActivity() {
             }
         })
 
+        recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
+//                if (dy > 0) {
+                val visibleItemCount = viewManager.childCount
+                pageSize = visibleItemCount
+                val pastVisibleItem = (viewManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                val total = viewAdapter.itemCount
+
+                if (!isLoading) {
+
+                    if ((visibleItemCount + pastVisibleItem) >= total) {
+                        (viewAdapter as BeerListAdapter).nextPage()
+                        isLoading = true
+                    }
+
+                }
+                else {
+                    isLoading = false
+                }
+//                }
+
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
+
         RetrofitInitializer()
 
 
@@ -48,18 +78,18 @@ class ListActivity : AppCompatActivity() {
 
 
     private fun configureList(beers: List<Beer>) {
-        val recyclerView = findViewById<RecyclerView>(R.id.list_recycler_view).apply {
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView).apply {
 
             setHasFixedSize(true)
 
-            viewAdapter = BeerListAdapter(beers)
+            viewAdapter = BeerListAdapter(beers, pageSize)
 
             layoutManager = viewManager
 
             adapter = viewAdapter
 
         }
-        recyclerView.adapter = BeerListAdapter(beers)
+        recyclerView.adapter = viewAdapter
         val layoutManager = StaggeredGridLayoutManager(
             2, StaggeredGridLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
