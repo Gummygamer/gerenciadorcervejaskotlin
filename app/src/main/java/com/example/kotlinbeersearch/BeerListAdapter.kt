@@ -22,7 +22,9 @@ class BeerListAdapter(private val myDataset: List<Beer>):
     override fun onBindViewHolder(holder: BeerViewHolder, position: Int) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.textView.text = myDataset[position].name
+
+        val currentBeer = myDataset[position]
+        holder.textView.text = """Name: ${currentBeer.name} Tagline: ${currentBeer.tagline} Description: ${currentBeer.description}"""
     }
 
     override fun getItemCount() = myDataset.size
